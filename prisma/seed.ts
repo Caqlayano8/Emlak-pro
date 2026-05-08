@@ -13,6 +13,19 @@ async function main() {
   // Create users
   const hashedPassword = await bcrypt.hash("123456", 12);
 
+  // Create admin user
+  const admin = await prisma.user.create({
+    data: {
+      name: "Admin",
+      email: "admin@emlakpro.com",
+      password: hashedPassword,
+      phone: "0500 000 00 00",
+      role: "admin",
+      city: "İstanbul",
+      bio: "EmlakPro Sistem Yöneticisi",
+    },
+  });
+
   const user1 = await prisma.user.create({
     data: {
       name: "Ahmet Yılmaz",
@@ -315,8 +328,18 @@ async function main() {
     },
   });
 
+  await prisma.notification.create({
+    data: {
+      type: "system",
+      title: "Admin Paneli Aktif",
+      content: "Yönetici paneliniz hazır. /admin adresinden tüm modülleri yönetebilirsiniz.",
+      userId: admin.id,
+    },
+  });
+
   console.log("Database seeded successfully!");
   console.log("Test accounts:");
+  console.log("  admin@emlakpro.com / 123456 (admin)");
   console.log("  ahmet@emlakpro.com / 123456 (agent)");
   console.log("  fatma@emlakpro.com / 123456 (agent)");
   console.log("  mehmet@emlakpro.com / 123456 (user)");
