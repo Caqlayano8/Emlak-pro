@@ -13,12 +13,40 @@ async function requireAdmin() {
 }
 
 export async function getSiteSettings() {
-  const settings = await prisma.siteSettings.upsert({
-    where: { id: "default" },
-    update: {},
-    create: { id: "default" },
-  });
-  return settings;
+  try {
+    const settings = await prisma.siteSettings.upsert({
+      where: { id: "default" },
+      update: {},
+      create: { id: "default" },
+    });
+    return settings;
+  } catch {
+    return {
+      id: "default",
+      siteName: "EmlakPro",
+      siteDescription: "Turkiye'nin en modern emlak platformu",
+      primaryColor: "#4F46E5",
+      secondaryColor: "#7C3AED",
+      accentColor: "#F59E0B",
+      headerBg: "#FFFFFF",
+      footerBg: "#1F2937",
+      fontFamily: "Geist",
+      logoUrl: null,
+      faviconUrl: null,
+      whatsappEnabled: true,
+      whatsappNumber: "+905478966096",
+      whatsappMessage: "Merhaba, EmlakPro hakkinda bilgi almak istiyorum.",
+      contactEmail: "info@emlakpro.com",
+      contactPhone: "0212 000 00 00",
+      contactAddress: "Istanbul, Turkiye",
+      footerText: "EmlakPro - Tum haklari saklidir.",
+      metaKeywords: "emlak, satilik, kiralik, daire, villa, arsa",
+      socialFacebook: null,
+      socialTwitter: null,
+      socialInstagram: null,
+      socialYoutube: null,
+    };
+  }
 }
 
 export async function updateSiteSettingsAction(formData: FormData) {
@@ -86,7 +114,11 @@ export async function updateSiteSettingsAction(formData: FormData) {
 
 // Advertisement management
 export async function getAdvertisements() {
-  return prisma.advertisement.findMany({ orderBy: [{ position: "asc" }, { order: "asc" }] });
+  try {
+    return await prisma.advertisement.findMany({ orderBy: [{ position: "asc" }, { order: "asc" }] });
+  } catch {
+    return [];
+  }
 }
 
 export async function createAdvertisementAction(formData: FormData) {
@@ -124,6 +156,7 @@ export async function createAdvertisementAction(formData: FormData) {
   });
 
   revalidatePath("/admin/reklamlar");
+  revalidatePath("/", "layout");
   return { success: "Reklam eklendi" };
 }
 
@@ -157,6 +190,7 @@ export async function updateAdvertisementAction(formData: FormData) {
   await prisma.advertisement.update({ where: { id }, data });
 
   revalidatePath("/admin/reklamlar");
+  revalidatePath("/", "layout");
   return { success: "Reklam guncellendi" };
 }
 
@@ -164,6 +198,7 @@ export async function deleteAdvertisementAction(id: string) {
   await requireAdmin();
   await prisma.advertisement.delete({ where: { id } });
   revalidatePath("/admin/reklamlar");
+  revalidatePath("/", "layout");
   return { success: "Reklam silindi" };
 }
 
@@ -173,12 +208,17 @@ export async function toggleAdvertisementAction(id: string) {
   if (!ad) return { error: "Reklam bulunamadi" };
   await prisma.advertisement.update({ where: { id }, data: { isActive: !ad.isActive } });
   revalidatePath("/admin/reklamlar");
+  revalidatePath("/", "layout");
   return { success: ad.isActive ? "Reklam devre disi birakildi" : "Reklam aktif edildi" };
 }
 
 // Custom Page management
 export async function getCustomPages() {
-  return prisma.customPage.findMany({ orderBy: { order: "asc" } });
+  try {
+    return await prisma.customPage.findMany({ orderBy: { order: "asc" } });
+  } catch {
+    return [];
+  }
 }
 
 export async function createCustomPageAction(formData: FormData) {

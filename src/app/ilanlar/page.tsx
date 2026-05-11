@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { PropertyCard } from "@/components/PropertyCard";
 import { FilterSidebar } from "./FilterSidebar";
+import { AdBanner } from "@/components/AdBanner";
 import { Prisma } from "@/generated/prisma/client";
 
 export const metadata = { title: "İlanlar - EmlakPro" };
@@ -98,7 +99,10 @@ export default async function ListingsPage({ searchParams }: Props) {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
-        <FilterSidebar currentParams={params} />
+        <div className="space-y-6">
+          <FilterSidebar currentParams={params} />
+          <AdBanner position="sidebar" className="hidden lg:block" />
+        </div>
 
         <div className="flex-1">
           {/* Sort Bar */}

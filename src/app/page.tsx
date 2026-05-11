@@ -4,6 +4,7 @@ import { PropertyCard } from "@/components/PropertyCard";
 import { getSession } from "@/lib/auth";
 import { CATEGORIES, CITIES } from "@/lib/utils";
 import { HeroSearch } from "@/components/HeroSearch";
+import { AdBanner } from "@/components/AdBanner";
 
 export default async function HomePage() {
   const session = await getSession();
@@ -90,6 +91,11 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Header Ad */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <AdBanner position="header" className="mb-4" />
+      </div>
 
       {/* Categories */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
@@ -205,6 +211,11 @@ export default async function HomePage() {
         )}
       </section>
 
+      {/* Between-Listings Ad */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <AdBanner position="between-listings" />
+      </div>
+
       {/* Latest Properties */}
       {latestProperties.length > 4 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
@@ -220,6 +231,11 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Footer Ad */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <AdBanner position="footer" />
+      </div>
 
       {/* CTA Section */}
       {!session && (
