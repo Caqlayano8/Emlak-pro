@@ -156,6 +156,7 @@ export async function createAdvertisementAction(formData: FormData) {
   });
 
   revalidatePath("/admin/reklamlar");
+  revalidatePath("/", "layout");
   return { success: "Reklam eklendi" };
 }
 
@@ -189,6 +190,7 @@ export async function updateAdvertisementAction(formData: FormData) {
   await prisma.advertisement.update({ where: { id }, data });
 
   revalidatePath("/admin/reklamlar");
+  revalidatePath("/", "layout");
   return { success: "Reklam guncellendi" };
 }
 
@@ -196,6 +198,7 @@ export async function deleteAdvertisementAction(id: string) {
   await requireAdmin();
   await prisma.advertisement.delete({ where: { id } });
   revalidatePath("/admin/reklamlar");
+  revalidatePath("/", "layout");
   return { success: "Reklam silindi" };
 }
 
@@ -205,6 +208,7 @@ export async function toggleAdvertisementAction(id: string) {
   if (!ad) return { error: "Reklam bulunamadi" };
   await prisma.advertisement.update({ where: { id }, data: { isActive: !ad.isActive } });
   revalidatePath("/admin/reklamlar");
+  revalidatePath("/", "layout");
   return { success: ad.isActive ? "Reklam devre disi birakildi" : "Reklam aktif edildi" };
 }
 

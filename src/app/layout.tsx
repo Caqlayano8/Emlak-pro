@@ -26,7 +26,7 @@ export default async function RootLayout({
   return (
     <html lang="tr" className={`${geist.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-gray-50 font-[family-name:var(--font-geist)]">
-        <Navbar />
+        <Navbar settings={settings} />
         <main className="flex-1">{children}</main>
         <Footer settings={settings} />
         <WhatsAppButton
