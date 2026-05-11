@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { getSiteSettings } from "@/app/actions/site-settings";
 
 const geist = Geist({
   variable: "--font-geist",
@@ -12,21 +13,27 @@ const geist = Geist({
 
 export const metadata: Metadata = {
   title: "EmlakPro - Modern Emlak Platformu",
-  description: "Türkiye'nin en modern emlak platformu. Satılık ve kiralık konut, arsa, arazi, dükkan ilanları.",
+  description: "Turkiye'nin en modern emlak platformu. Satilik ve kiralik konut, arsa, arazi, dukkan ilanlari.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSiteSettings();
+
   return (
     <html lang="tr" className={`${geist.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-gray-50 font-[family-name:var(--font-geist)]">
         <Navbar />
         <main className="flex-1">{children}</main>
-        <Footer />
-        <WhatsAppButton />
+        <Footer settings={settings} />
+        <WhatsAppButton
+          phoneNumber={settings.whatsappNumber}
+          message={settings.whatsappMessage}
+          enabled={settings.whatsappEnabled}
+        />
       </body>
     </html>
   );

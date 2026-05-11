@@ -337,6 +337,82 @@ async function main() {
     },
   });
 
+  // Create default site settings
+  await prisma.siteSettings.upsert({
+    where: { id: "default" },
+    update: {},
+    create: {
+      id: "default",
+      siteName: "EmlakPro",
+      siteDescription: "Turkiye'nin en modern emlak platformu",
+      primaryColor: "#2563eb",
+      secondaryColor: "#4f46e5",
+      accentColor: "#06b6d4",
+      headerBg: "#ffffff",
+      footerBg: "#1f2937",
+      whatsappNumber: "905478966096",
+      whatsappMessage: "Merhaba, EmlakPro hakkinda bilgi almak istiyorum.",
+      whatsappEnabled: true,
+      contactEmail: "info@emlakpro.com",
+      contactPhone: "0212 000 00 00",
+      contactAddress: "Istanbul, Turkiye",
+      footerText: "EmlakPro - Tum haklari saklidir.",
+      metaKeywords: "emlak, satilik, kiralik, daire, villa, arsa",
+    },
+  });
+
+  // Create sample custom pages
+  await prisma.customPage.create({
+    data: {
+      title: "Hakkimizda",
+      slug: "hakkimizda",
+      content: `<h2>EmlakPro Hakkinda</h2>
+<p>EmlakPro, Turkiye'nin en modern ve guvenilir emlak platformudur. 2024 yilindan bu yana binlerce alici ve saticiyi bir araya getiriyoruz.</p>
+<h3>Misyonumuz</h3>
+<p>Emlak sektorunde seffaflik ve guvenilirlik saglayarak, alicilarin ve saticilarin en iyi deneyimi yasamasini saglamaktir.</p>
+<h3>Vizyonumuz</h3>
+<p>Turkiye'nin lider emlak platformu olarak, teknoloji ve yenilikcilikle sektore yon vermektir.</p>`,
+      isPublished: true,
+      showInNav: true,
+      showInFooter: true,
+      order: 0,
+    },
+  });
+
+  await prisma.customPage.create({
+    data: {
+      title: "Gizlilik Politikasi",
+      slug: "gizlilik",
+      content: `<h2>Gizlilik Politikasi</h2>
+<p>EmlakPro olarak kisisel verilerinizin korunmasina buyuk onem veriyoruz.</p>
+<h3>Toplanan Veriler</h3>
+<p>Platformumuzu kullanirken ad, soyad, e-posta, telefon numarasi gibi bilgiler toplanmaktadir.</p>
+<h3>Verilerin Kullanimi</h3>
+<p>Toplanan veriler yalnizca hizmet sunumu ve iyilestirme amaciyla kullanilmaktadir.</p>`,
+      isPublished: true,
+      showInNav: false,
+      showInFooter: true,
+      order: 1,
+    },
+  });
+
+  await prisma.customPage.create({
+    data: {
+      title: "Kullanim Kosullari",
+      slug: "kullanim-kosullari",
+      content: `<h2>Kullanim Kosullari</h2>
+<p>EmlakPro platformunu kullanarak asagidaki kosullari kabul etmis sayilirsiniz.</p>
+<h3>Genel Kurallar</h3>
+<p>Platform uzerinde yaniltici veya sahte ilan yayinlamak yasaktir. Tum ilanlar gercek bilgileri yansitmalidir.</p>
+<h3>Sorumluluk</h3>
+<p>Ilan sahipleri, ilanlarin dogru ve guncel olmasindan sorumludur.</p>`,
+      isPublished: true,
+      showInNav: false,
+      showInFooter: true,
+      order: 2,
+    },
+  });
+
   console.log("Database seeded successfully!");
   console.log("Test accounts:");
   console.log("  admin@emlakpro.com / 123456 (admin)");

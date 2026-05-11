@@ -141,6 +141,63 @@ model Notification {
   @@index([userId])
 }
 
+model SiteSettings {
+  id              String   @id @default("default")
+  siteName        String   @default("EmlakPro")
+  siteDescription String   @default("Turkiye'nin en modern emlak platformu")
+  logoUrl         String?
+  faviconUrl      String?
+  primaryColor    String   @default("#2563eb")
+  secondaryColor  String   @default("#4f46e5")
+  accentColor     String   @default("#06b6d4")
+  headerBg        String   @default("#ffffff")
+  footerBg        String   @default("#1f2937")
+  fontFamily      String   @default("Geist")
+  whatsappNumber  String   @default("905478966096")
+  whatsappMessage String   @default("Merhaba, EmlakPro hakkinda bilgi almak istiyorum.")
+  whatsappEnabled Boolean  @default(true)
+  contactEmail    String   @default("info@emlakpro.com")
+  contactPhone    String   @default("0212 000 00 00")
+  contactAddress  String   @default("Istanbul, Turkiye")
+  footerText      String   @default("EmlakPro - Tum haklari saklidir.")
+  metaKeywords    String   @default("emlak, satilik, kiralik, daire, villa, arsa")
+  socialFacebook  String?
+  socialTwitter   String?
+  socialInstagram String?
+  socialYoutube   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Advertisement {
+  id          String   @id @default(cuid())
+  title       String
+  imageUrl    String
+  linkUrl     String?
+  position    String   // header, sidebar, footer, between-listings, popup
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  startDate   DateTime?
+  endDate     DateTime?
+  clicks      Int      @default(0)
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CustomPage {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String
+  isPublished Boolean  @default(true)
+  order       Int      @default(0)
+  showInNav   Boolean  @default(false)
+  showInFooter Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model Review {
   id         String   @id @default(cuid())
   rating     Int
