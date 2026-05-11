@@ -1,32 +1,38 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { loginAction } from "@/app/actions/auth";
 
 export function LoginForm() {
   const [error, setError] = useState("");
   const [requires2FA, setRequires2FA] = useState(false);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (formData: FormData) => {
     setLoading(true);
     setError("");
-    try {
-      const result = await loginAction(formData);
-      if (result && "error" in result && result.error) {
-        setError(result.error);
-        if ("requires2FA" in result && result.requires2FA) {
-          setRequires2FA(true);
-        }
-      }
-      if (result && "requires2FA" in result && result.requires2FA && !("error" in result)) {
+    const result = await loginAction(formData);
+    if (result && "error" in result && result.error) {
+      setError(result.error);
+      if ("requires2FA" in result && result.requires2FA) {
         setRequires2FA(true);
       }
-    } catch {
-      // redirect throws, this is expected
-    } finally {
       setLoading(false);
+      return;
     }
+    if (result && "requires2FA" in result && result.requires2FA && !("error" in result)) {
+      setRequires2FA(true);
+      setLoading(false);
+      return;
+    }
+    if (result && "redirect" in result && result.redirect) {
+      router.push(result.redirect as string);
+      router.refresh();
+      return;
+    }
+    setLoading(false);
   };
 
   return (

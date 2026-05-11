@@ -2,13 +2,37 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { logoutAction } from "@/app/actions/auth";
+import { useRouter } from "next/navigation";
+import { logoutAndReturn } from "@/app/actions/auth";
 import type { SessionUser } from "@/lib/auth";
 
 interface NavbarClientProps {
   session: SessionUser | null;
   unreadCount: number;
   unreadMessages: number;
+}
+
+function LogoutButton({ onDone }: { onDone: () => void }) {
+  const router = useRouter();
+  const handleLogout = async () => {
+    onDone();
+    const result = await logoutAndReturn();
+    if (result && "redirect" in result && result.redirect) {
+      router.push(result.redirect as string);
+      router.refresh();
+    }
+  };
+  return (
+    <button
+      onClick={handleLogout}
+      className="flex items-center gap-3 w-full px-4 py-2 text-red-600 hover:bg-red-50"
+    >
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+      </svg>
+      Cikis Yap
+    </button>
+  );
 }
 
 export function NavbarClient({ session, unreadCount, unreadMessages }: NavbarClientProps) {
@@ -119,18 +143,7 @@ export function NavbarClient({ session, unreadCount, unreadMessages }: NavbarCli
                     </Link>
                   )}
                   <hr className="my-1 border-gray-100" />
-                  <form action={logoutAction}>
-                    <button
-                      type="submit"
-                      className="flex items-center gap-3 w-full px-4 py-2 text-red-600 hover:bg-red-50"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                      </svg>
-                      Çıkış Yap
-                    </button>
-                  </form>
+                  <LogoutButton onDone={() => setMenuOpen(false)} />
                 </div>
               )}
             </div>

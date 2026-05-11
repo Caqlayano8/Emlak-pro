@@ -1,25 +1,29 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { registerAction } from "@/app/actions/auth";
 
 export function RegisterForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (formData: FormData) => {
     setLoading(true);
     setError("");
-    try {
-      const result = await registerAction(formData);
-      if (result && "error" in result) {
-        setError(result.error || "Bir hata oluştu");
-      }
-    } catch {
-      // redirect throws
-    } finally {
+    const result = await registerAction(formData);
+    if (result && "error" in result) {
+      setError(result.error || "Bir hata olustu");
       setLoading(false);
+      return;
     }
+    if (result && "redirect" in result && result.redirect) {
+      router.push(result.redirect as string);
+      router.refresh();
+      return;
+    }
+    setLoading(false);
   };
 
   return (

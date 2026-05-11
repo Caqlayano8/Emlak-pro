@@ -2,7 +2,6 @@
 
 import { prisma } from "@/lib/db";
 import { hashPassword, verifyPassword, createSession, destroySession, getSession } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 export async function registerAction(formData: FormData) {
@@ -44,7 +43,7 @@ export async function registerAction(formData: FormData) {
     avatar: user.avatar,
   });
 
-  redirect("/");
+  return { success: true, redirect: "/" };
 }
 
 export async function loginAction(formData: FormData) {
@@ -88,12 +87,19 @@ export async function loginAction(formData: FormData) {
     avatar: user.avatar,
   });
 
-  redirect("/");
+  return { success: true, redirect: "/" };
 }
 
 export async function logoutAction() {
   await destroySession();
-  redirect("/giris");
+  revalidatePath("/");
+  return { success: true, redirect: "/giris" };
+}
+
+export async function logoutAndReturn() {
+  await destroySession();
+  revalidatePath("/");
+  return { success: true, redirect: "/giris" };
 }
 
 export async function updateProfileAction(formData: FormData) {
@@ -164,10 +170,10 @@ export async function enable2FAAction() {
   const session = await getSession();
   if (!session) return { error: "Oturum açmanız gerekiyor" };
 
+  try {
   const otplib = await import("otplib");
-  const { generateTOTP } = await import("@otplib/uri");
   const secret = otplib.generateSecret();
-  const otpauth = generateTOTP({ label: session.email, secret, issuer: "EmlakPro" });
+  const otpauth = `otpauth://totp/EmlakPro:${encodeURIComponent(session.email)}?secret=${secret}&issuer=EmlakPro`;
 
   await prisma.user.update({
     where: { id: session.id },
@@ -175,6 +181,9 @@ export async function enable2FAAction() {
   });
 
   return { secret, otpauth };
+  } catch {
+    return { error: "2FA etkinlestirme sirasinda hata olustu" };
+  }
 }
 
 export async function verify2FAAction(formData: FormData) {
@@ -187,13 +196,14 @@ export async function verify2FAAction(formData: FormData) {
   const user = await prisma.user.findUnique({ where: { id: session.id } });
   if (!user?.twoFactorSecret) return { error: "2FA ayarlanmamış" };
 
+  try {
   const otplib = await import("otplib");
   const result = otplib.verifySync({
     token: code,
     secret: user.twoFactorSecret,
   });
 
-  if (!result.valid) return { error: "Geçersiz doğrulama kodu" };
+  if (!result.valid) return { error: "Gecersiz dogrulama kodu" };
 
   await prisma.user.update({
     where: { id: session.id },
@@ -201,7 +211,10 @@ export async function verify2FAAction(formData: FormData) {
   });
 
   revalidatePath("/profil");
-  return { success: "İki faktörlü doğrulama etkinleştirildi" };
+  return { success: "Iki faktorlu dogrulama etkinlestirildi" };
+  } catch {
+    return { error: "Dogrulama sirasinda hata olustu" };
+  }
 }
 
 export async function disable2FAAction() {

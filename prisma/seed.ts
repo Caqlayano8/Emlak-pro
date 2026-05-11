@@ -14,8 +14,10 @@ async function main() {
   const hashedPassword = await bcrypt.hash("123456", 12);
 
   // Create admin user
-  const admin = await prisma.user.create({
-    data: {
+  const admin = await prisma.user.upsert({
+    where: { email: "admin@emlakpro.com" },
+    update: {},
+    create: {
       name: "Admin",
       email: "admin@emlakpro.com",
       password: hashedPassword,
@@ -26,8 +28,10 @@ async function main() {
     },
   });
 
-  const user1 = await prisma.user.create({
-    data: {
+  const user1 = await prisma.user.upsert({
+    where: { email: "ahmet@emlakpro.com" },
+    update: {},
+    create: {
       name: "Ahmet Yılmaz",
       email: "ahmet@emlakpro.com",
       password: hashedPassword,
@@ -38,8 +42,10 @@ async function main() {
     },
   });
 
-  const user2 = await prisma.user.create({
-    data: {
+  const user2 = await prisma.user.upsert({
+    where: { email: "fatma@emlakpro.com" },
+    update: {},
+    create: {
       name: "Fatma Demir",
       email: "fatma@emlakpro.com",
       password: hashedPassword,
@@ -50,8 +56,10 @@ async function main() {
     },
   });
 
-  const user3 = await prisma.user.create({
-    data: {
+  const user3 = await prisma.user.upsert({
+    where: { email: "mehmet@emlakpro.com" },
+    update: {},
+    create: {
       name: "Mehmet Kaya",
       email: "mehmet@emlakpro.com",
       password: hashedPassword,
@@ -279,63 +287,70 @@ async function main() {
     },
   ];
 
-  for (const prop of properties) {
-    await prisma.property.create({ data: prop });
+  const existingProperties = await prisma.property.count();
+  if (existingProperties === 0) {
+    for (const prop of properties) {
+      await prisma.property.create({ data: prop });
+    }
   }
 
-  // Create sample messages
-  await prisma.message.create({
-    data: {
-      content: "Merhaba, Kadıköy'deki daire hala satılık mı?",
-      senderId: user3.id,
-      receiverId: user1.id,
-    },
-  });
+  const existingMessages = await prisma.message.count();
+  if (existingMessages === 0) {
+    await prisma.message.create({
+      data: {
+        content: "Merhaba, Kadıköy'deki daire hala satılık mı?",
+        senderId: user3.id,
+        receiverId: user1.id,
+      },
+    });
 
-  await prisma.message.create({
-    data: {
-      content: "Merhaba, evet hala satılık. Randevu almak ister misiniz?",
-      senderId: user1.id,
-      receiverId: user3.id,
-    },
-  });
+    await prisma.message.create({
+      data: {
+        content: "Merhaba, evet hala satılık. Randevu almak ister misiniz?",
+        senderId: user1.id,
+        receiverId: user3.id,
+      },
+    });
+  }
 
-  // Create sample notifications
-  await prisma.notification.create({
-    data: {
-      type: "system",
-      title: "Hoş Geldiniz!",
-      content: "EmlakPro'ya hoş geldiniz. Hemen ilan vermeye veya ev aramaya başlayın!",
-      userId: user1.id,
-    },
-  });
+  const existingNotifications = await prisma.notification.count();
+  if (existingNotifications === 0) {
+    await prisma.notification.create({
+      data: {
+        type: "system",
+        title: "Hoş Geldiniz!",
+        content: "EmlakPro'ya hoş geldiniz. Hemen ilan vermeye veya ev aramaya başlayın!",
+        userId: user1.id,
+      },
+    });
 
-  await prisma.notification.create({
-    data: {
-      type: "system",
-      title: "Hoş Geldiniz!",
-      content: "EmlakPro'ya hoş geldiniz. Hemen ilan vermeye veya ev aramaya başlayın!",
-      userId: user2.id,
-    },
-  });
+    await prisma.notification.create({
+      data: {
+        type: "system",
+        title: "Hoş Geldiniz!",
+        content: "EmlakPro'ya hoş geldiniz. Hemen ilan vermeye veya ev aramaya başlayın!",
+        userId: user2.id,
+      },
+    });
 
-  await prisma.notification.create({
-    data: {
-      type: "system",
-      title: "Hoş Geldiniz!",
-      content: "EmlakPro'ya hoş geldiniz. Hayalinizdeki evi bulmaya başlayın!",
-      userId: user3.id,
-    },
-  });
+    await prisma.notification.create({
+      data: {
+        type: "system",
+        title: "Hoş Geldiniz!",
+        content: "EmlakPro'ya hoş geldiniz. Hayalinizdeki evi bulmaya başlayın!",
+        userId: user3.id,
+      },
+    });
 
-  await prisma.notification.create({
-    data: {
-      type: "system",
-      title: "Admin Paneli Aktif",
-      content: "Yönetici paneliniz hazır. /admin adresinden tüm modülleri yönetebilirsiniz.",
-      userId: admin.id,
-    },
-  });
+    await prisma.notification.create({
+      data: {
+        type: "system",
+        title: "Admin Paneli Aktif",
+        content: "Yönetici paneliniz hazır. /admin adresinden tüm modülleri yönetebilirsiniz.",
+        userId: admin.id,
+      },
+    });
+  }
 
   // Create default site settings
   await prisma.siteSettings.upsert({
@@ -361,7 +376,8 @@ async function main() {
     },
   });
 
-  // Create sample custom pages
+  const existingPages = await prisma.customPage.count();
+  if (existingPages === 0) {
   await prisma.customPage.create({
     data: {
       title: "Hakkimizda",
@@ -412,6 +428,7 @@ async function main() {
       order: 2,
     },
   });
+  }
 
   console.log("Database seeded successfully!");
   console.log("Test accounts:");
